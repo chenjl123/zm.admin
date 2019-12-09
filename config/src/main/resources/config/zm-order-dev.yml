@@ -1,0 +1,32 @@
+server:
+  port: 9002
+eureka:
+  instance:
+    non-secure-port: ${server.port:9001}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}(${spring.cloud.client.ipAddress}):${server.port}
+  client:
+    service-url:
+      defaultZone: http://zm:zm123@127.0.0.1:8001/eureka/
+spring:
+  application:
+    name: zm-order
+
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zm_order?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    redis:
+      host: localhost
+      port: 6379
+      jedis:
+        pool:
+          max-idle: 8
+          min-idle: 0
+          max-active: 8
+          max-wait: -1
+      timeout: 0
+

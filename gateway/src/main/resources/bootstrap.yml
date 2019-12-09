@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    config:
+      name: zm-gateway
+      profile: dev
+      uri: http://127.0.0.1:8002/
+
+
+
+
+

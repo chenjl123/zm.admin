@@ -1,0 +1,42 @@
+hystrix.command.fallbackcmd.execution.isolation.thread.timeoutInMilliseconds: 5000
+server:
+  port: 8003
+eureka:
+  instance:
+    non-secure-port: ${server.port:8003}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}(${spring.cloud.client.ipAddress}):${server.port}
+  client:
+    service-url:
+      defaultZone: http://zm:zm123@127.0.0.1:8001/eureka/
+spring:
+  application:
+    name: zm-gateway
+  cloud:
+    gateway:
+      default-filters:  #里面可以定义一些共同的filter，对所有路由都起作用
+      routes:
+        - id: zm-manager   #这个路由的唯一id，不定义的话为一个uuid
+          uri: lb://zm-manager  #http请求为lb://前缀 + 服务id；ws请求为lb:ws://前缀 + 服务id；表示将请求负载到哪一个服务上
+          predicates:
+            - Path=/api-manager/**     #路由匹配
+          filters:
+            - StripPrefix= 1     #截取访问的第一个位置，就是api-manager会被忽略服务的路由地址
+            - name: Hystrix
+              args:
+                name: fallbackcmd  #名称跟 hystrix.command.fallbackcmd.execution.isolation.thread.timeoutInMilliseconds  command后面的名称要一致
+                fallbackUri: forward:/hystrixTimeout
+            - name: Log
+              args:
+                enabled: true
+            - name: RequestRateLimiter    #限流过滤器
+              args:
+                key-resolver: '#{@uriKeyResolver}'         #用于限流的键的解析器的 Bean 对象的名字
+                redis-rate-limiter.replenishRate: 1                 #令牌桶每秒填充平均速率。
+                redis-rate-limiter.burstCapacity: 3                 #令牌桶总容量
+  redis:
+    host: localhost
+    port: 6379
+
+
+

@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    config:
+      name: zm-order
+      profile: dev
+      uri: http://127.0.0.1:8002/
+
+
+
+
+
+
+
